@@ -1,6 +1,7 @@
 import re
 from urllib.parse import urlparse
 
+"""This is an edit to have a commit to come back, check git commit for more details"""
 def scraper(url, resp):
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
