@@ -1,3 +1,8 @@
+
+"""
+worker.py  –  UCI Web Crawler  (redesigned by Claude for correctness and optimization):
+
+"""
 from threading import Thread
 from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 from inspect import getsource
@@ -24,7 +29,7 @@ class Worker(Thread):
 
         # Basic check for forbidden requests in scraper
         assert all(scraper_src.find(req) == -1 for req in forbidden_reqs), \
-            "Do not use requests or urllib.request in official_scraper.txt"
+            "Do not use requests or urllib.request in scraper.py"
 
         super().__init__(daemon=True)
 

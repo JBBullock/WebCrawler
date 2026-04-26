@@ -1,28 +1,6 @@
-"""
-official_scraper.txt  –  TEST MODE  (web-scraping.dev practice domains)
 
-Seed URLs
-=========
-    https://web-scraping.dev/products
-    https://web-scraping.dev/testimonials
-
-To restore UCI production crawl, replace VALID_DOMAINS with the four
-.uci.edu entries, raise MIN_WORD_COUNT back to 200, and set
-MAX_URL_DEPTH back to 6.
-
-Design goals (unchanged from production)
-=========================================
-1.  High textual information content only (text/html, min word count, min
-    text-to-markup ratio).
-2.  Dead-URL detection  – 200 responses that carry no usable content.
-3.  Large-file avoidance  – skip oversized payloads before parsing them.
-4.  Exact-duplicate detection  – SHA-256 fingerprint of normalised text.
-5.  Near-duplicate detection   – 64-bit SimHash; pages within Hamming
-    distance <= 3 are treated as the same page.
-6.  Infinite-trap avoidance    – URL depth, repeated path segments,
-    excessive query parameters, calendar/date pattern detection, and a
-    per-domain URL-count budget.
-7.  Analytics collection for the written report.
+"""scraper.py  –
+UCI Web Crawler  (redesigned by Claude for correctness and optimization)
 """
 
 import hashlib
@@ -35,21 +13,17 @@ from urllib.parse import urljoin, urldefrag, urlparse, parse_qs
 # Configuration – tweak these without touching logic below
 # ============================================================
 
-# ── TEST domains ──────────────────────────────────────────────────────────
-# Seed:  https://web-scraping.dev/products
-#        https://web-scraping.dev/testimonials
-#
-# Only "web-scraping.dev" (and any subdomains) will be crawled.
-# Restore the four .uci.edu entries here when switching back to production.
 VALID_DOMAINS = (
-    "web-scraping.dev",      # exact match (no leading dot)
-    ".web-scraping.dev",     # any subdomain, e.g. api.web-scraping.dev
+    ".ics.uci.edu",
+    ".cs.uci.edu",
+    ".informatics.uci.edu",
+    ".stat.uci.edu",
 )
 
 MAX_CONTENT_BYTES   = 5 * 1024 * 1024   # 5 MB hard cap before parsing
-MIN_WORD_COUNT      = 20                # lowered: test pages are smaller than UCI pages
-MIN_TEXT_RATIO      = 0.05              # lowered: product/testimonial pages are tag-heavy
-MAX_URL_DEPTH       = 4                 # tightened: site is shallow (/products/1 etc.)
+MIN_WORD_COUNT      = 50               # pages with fewer words are low-value
+MIN_TEXT_RATIO      = 0.02             # text chars / total HTML chars
+MAX_URL_DEPTH       = 6                 # path segments (/ separated)
 MAX_QUERY_PARAMS    = 4                 # too many params -> likely a trap
 MAX_URLS_PER_DOMAIN = 500              # per-domain crawl budget
 SIMHASH_BITS        = 64
